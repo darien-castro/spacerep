@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpaceRep — Spaced Repetition</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+
+  <div class="app-layout">
+    
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <a href="#" class="brand-link" id="brand-home-btn">
+          <span class="brand-moon">☾</span>
+          <span class="brand-title">spacerep</span>
+        </a>
+        <nav class="nav-links">
+          <button class="nav-btn active" data-view="decks">
+            decks
+            <span class="nav-badge" id="nav-due-badge" style="display: none;">0</span>
+          </button>
+          <button class="nav-btn" data-view="distribution">distribution</button>
+          <button class="nav-btn" data-view="stats">stats</button>
+        </nav>
+      </div>
+
+      <div class="header-right">
+        <div class="streak-badge" title="Daily study streak">
+          <span class="streak-lbl">streak:</span>
+          <span id="header-streak" class="streak-val">0d</span>
+        </div>
+        
+        <!-- Theme Toggle -->
+        <button class="btn btn-ghost btn-sm" id="btn-theme-toggle" title="Toggle theme">
+          <span id="theme-icon">☼</span>
+          <span id="theme-text">light</span>
+        </button>
+
+        <button class="btn btn-primary btn-sm" id="btn-create-deck-top">
+          + new deck
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+      <!-- VIEW 1: DECKS LIST (HOME) -->
+      <section id="view-decks" class="view active">
+        <div class="view-header">
+          <div class="section-tag-row">
+            <span class="section-tag">// DECKS</span>
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-create-deck">
+            + new deck
+          </button>
+        </div>
+
+        <div class="decks-grid" id="decks-grid">
+          <!-- Rendered dynamically -->
+        </div>
+      </section>
+
+      <!-- VIEW 2: STUDY SESSION -->
+      <section id="view-study" class="view">
+        <div class="study-container">
+          
+          <!-- Study Top Bar -->
+          <div class="study-topbar">
+            <button class="btn btn-ghost btn-sm" id="btn-exit-study">
+              ← exit <kbd>esc</kbd>
+            </button>
+            
+            <div class="study-deck-title" id="study-deck-title">deck</div>
+            
+            <div class="study-progress-mono">
+              <span id="study-progress-text">1 / 10</span>
+            </div>
+          </div>
+
+          <!-- Progress Track -->
+          <div class="progress-track">
+            <div class="progress-fill" id="study-progress-bar"></div>
+          </div>
+
+          <!-- Flashcard Container -->
+          <div class="flashcard-wrapper">
+            <div class="flashcard" id="study-flashcard">
+              
+              <!-- Card Question Header -->
+              <div class="card-prompt-section">
+                <div class="card-meta">
+                  <span class="card-tag" id="card-level-badge">learning</span>
+                  <span class="card-due-tag" id="card-due-tag">due today</span>
+                </div>
+                
+                <div class="card-question" id="card-question-text">
+                  Question will appear here...
+                </div>
+
+                <!-- Hint (optional) -->
+                <div id="study-hint-container" class="hint-container" style="display: none;">
+                  <button class="btn-hint" id="btn-toggle-hint">[ + hint ]</button>
+                  <div class="hint-body" id="card-hint-text"></div>
+                </div>
+              </div>
+
+              <!-- Flip Prompt / Show Answer Trigger -->
+              <div class="card-action-prompt" id="card-reveal-prompt">
+                <button class="btn btn-secondary btn-reveal" id="btn-show-answer">
+                  show answer <kbd>space</kbd>
+                </button>
+              </div>
+
+              <!-- Card Answer (Revealed on Flip) -->
+              <div class="card-answer-section" id="card-answer-section" style="display: none;">
+                <div class="answer-divider">
+                  <span>solution</span>
+                </div>
+                
+                <div class="card-answer" id="card-answer-text">
+                  Answer will appear here...
+                </div>
+
+                <!-- Rating Buttons -->
+                <div class="review-ratings">
+                  <button class="rate-btn rate-again" data-rating="1">
+                    <span class="rate-key"><kbd>1</kbd> again</span>
+                    <span class="rate-interval" id="interval-preview-1">1d</span>
+                  </button>
+
+                  <button class="rate-btn rate-hard" data-rating="2">
+                    <span class="rate-key"><kbd>2</kbd> hard</span>
+                    <span class="rate-interval" id="interval-preview-2">2d</span>
+                  </button>
+
+                  <button class="rate-btn rate-good" data-rating="3">
+                    <span class="rate-key"><kbd>3</kbd> good</span>
+                    <span class="rate-interval" id="interval-preview-3">4d</span>
+                  </button>
+
+                  <button class="rate-btn rate-easy" data-rating="4">
+                    <span class="rate-key"><kbd>4</kbd> easy</span>
+                    <span class="rate-interval" id="interval-preview-4">7d</span>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Subtle feedback toast -->
+          <div class="study-toast" id="study-toast" style="display: none;">
+            <span id="toast-text">review logged</span>
+          </div>
+
+        </div>
+
+        <!-- Session Finished View -->
+        <div id="study-completed-card" class="study-completed-card" style="display: none;">
+          <div class="completed-tag">// SESSION COMPLETE</div>
+          <h2 class="completed-title">Deck Completed</h2>
+          <p class="completed-desc" id="completed-deck-summary">All due cards in this session have been reviewed.</p>
+          <div class="completed-actions">
+            <button class="btn btn-primary btn-sm" id="btn-finish-return">back to decks</button>
+            <button class="btn btn-secondary btn-sm" id="btn-finish-practice">practice again</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: DECK MANAGEMENT / CARD BROWSER -->
+      <section id="view-deck-manage" class="view">
+        <div class="manage-header">
+          <button class="btn btn-ghost btn-sm" id="btn-back-to-decks">
+            ← decks
+          </button>
+          
+          <div class="manage-deck-info">
+            <div>
+              <div class="section-tag">// DECK</div>
+              <h1 class="manage-deck-title" id="manage-deck-name">Deck Name</h1>
+              <p class="manage-deck-desc" id="manage-deck-desc">Description</p>
+            </div>
+            <div class="manage-actions">
+              <button class="btn btn-secondary btn-sm" id="btn-edit-deck">edit</button>
+              <button class="btn btn-ghost text-red btn-sm" id="btn-delete-deck">delete deck</button>
+              <button class="btn btn-primary btn-sm" id="btn-add-card">+ add card</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter / Search bar -->
+        <div class="table-toolbar">
+          <div class="search-input-wrapper">
+            <input type="text" id="card-search-input" class="form-input" placeholder="filter cards...">
+          </div>
+          <div class="filter-pills" id="card-filter-pills">
+            <button class="filter-pill active" data-filter="all">all [<span id="filter-count-all">0</span>]</button>
+            <button class="filter-pill" data-filter="due">due [<span id="filter-count-due">0</span>]</button>
+          </div>
+        </div>
+
+        <!-- Cards Table -->
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 44%;">Prompt</th>
+                <th style="width: 44%;">Solution</th>
+                <th style="width: 6%;">Interval</th>
+                <th style="width: 6%; text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="cards-table-body">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- VIEW 4: DISTRIBUTION & TERRITORY BREAKDOWN -->
+      <section id="view-distribution" class="view">
+        <div class="view-header">
+          <div class="section-tag-row">
+            <span class="section-tag">// DISTRIBUTION &amp; HEALTH</span>
+          </div>
+          
+          <!-- Deck Filter Selector -->
+          <div class="dist-deck-filter">
+            <span class="dist-filter-label">deck:</span>
+            <select id="dist-deck-select" class="form-input dist-select">
+              <option value="all">all decks (collection)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Hero: Pie / Donut Chart & Territory Cards -->
+        <div class="territory-hero-layout">
+          
+          <!-- Left: Vector Donut / Pie Chart -->
+          <div class="donut-chart-card">
+            <div class="chart-header-tag">// RETENTION PIE</div>
+
+            <div class="donut-chart-wrapper">
+              <svg id="territory-donut-svg" class="donut-svg" viewBox="0 0 220 220">
+                <!-- Slices rendered dynamically -->
+              </svg>
+              
+              <!-- Center interactive readout -->
+              <div class="donut-center-readout" id="donut-center-box">
+                <div class="donut-health-percent" id="donut-center-val">0%</div>
+                <div class="donut-health-label" id="donut-center-lbl">good territory</div>
+              </div>
+            </div>
+
+            <div class="donut-footer-stats">
+              <div class="donut-footer-item">
+                <span class="donut-footer-lbl">cards</span>
+                <span class="donut-footer-num" id="donut-total-cards">0</span>
+              </div>
+              <div class="donut-footer-divider"></div>
+              <div class="donut-footer-item">
+                <span class="donut-footer-lbl">due</span>
+                <span class="donut-footer-num text-amber" id="donut-due-cards">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: 4 Territory Panels -->
+          <div class="territories-panel" id="territories-panel-mount">
+            <!-- Rendered dynamically -->
+          </div>
+
+        </div>
+
+        <!-- Section: Cards in Bad Territory (Attention Needed) -->
+        <div class="stats-section" id="bad-cards-section" style="margin-top: 20px;">
+          <div class="section-title-row">
+            <div>
+              <div class="section-tag text-red">// BAD TERRITORY [LEAKING RETENTION]</div>
+              <p class="stats-subtext">Cards that lapsed, have low ease (&lt; 2.0), or are overdue.</p>
+            </div>
+          </div>
+          
+          <div id="bad-cards-list-mount">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Section: Deck-by-Deck Comparison Table -->
+        <div class="stats-section" style="margin-top: 20px;">
+          <div class="section-tag">// DECK HEALTH COMPARISON</div>
+          <div class="table-container" style="margin-top: 10px;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Deck</th>
+                  <th>Total</th>
+                  <th>Due</th>
+                  <th>Territory Spectrum</th>
+                  <th>Health</th>
+                  <th style="text-align: right;">Study</th>
+                </tr>
+              </thead>
+              <tbody id="distribution-deck-table-body">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Section: Upcoming 7-Day Forecast -->
+        <div class="stats-section" style="margin-top: 20px;">
+          <div class="section-tag">// 7-DAY SCHEDULE FORECAST</div>
+          <div class="forecast-schedule-strip" id="forecast-strip-mount">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+      </section>
+
+      <!-- VIEW 5: STATS & DATA -->
+      <section id="view-stats" class="view">
+        <div class="view-header">
+          <div class="section-tag-row">
+            <span class="section-tag">// STATS &amp; LOGS</span>
+          </div>
+        </div>
+
+        <!-- Metrics Row -->
+        <div class="stats-summary-grid">
+          <div class="stat-card">
+            <div class="stat-label">study streak</div>
+            <div class="stat-value text-purple" id="stat-streak">0d</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">total reviews</div>
+            <div class="stat-value text-green" id="stat-reviews-logged">0</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">total cards</div>
+            <div class="stat-value" id="stat-total-cards">0</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-label">due today</div>
+            <div class="stat-value text-amber" id="stat-due-today">0</div>
+          </div>
+        </div>
+
+        <!-- 14-Day Activity Log -->
+        <div class="stats-section">
+          <div class="section-tag">// 14-DAY LOG STRIP</div>
+          <div class="activity-strip" id="activity-strip">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Data Backup & Persistence -->
+        <div class="stats-section">
+          <div class="section-tag">// PERSISTENCE &amp; BACKUP</div>
+          <div class="persistence-notice">
+            <span>local database: <code id="stat-db-path">./data/spacerep.db</code></span>
+          </div>
+
+          <div class="data-actions-row">
+            <button class="btn btn-secondary btn-sm" id="btn-export-json">
+              export json
+            </button>
+
+            <label class="btn btn-secondary btn-sm file-btn">
+              import json
+              <input type="file" id="input-import-json" accept=".json" style="display: none;">
+            </label>
+
+            <button class="btn btn-ghost text-red btn-sm" id="btn-reset-db">
+              reset database
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- Simple Footer -->
+    <footer class="app-footer">
+      <span>☾ spacerep // local node+sqlite spaced repetition</span>
+    </footer>
+
+  </div>
+
+  <!-- =========================================================
+       MODALS
+       ========================================================= -->
+
+  <!-- Modal: Create / Edit Deck -->
+  <div class="modal-overlay" id="modal-deck">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="section-tag">// DECK CONFIG</span>
+          <h3 class="modal-title" id="modal-deck-title">New Deck</h3>
+        </div>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+
+      <input type="hidden" id="deck-form-id">
+
+      <div class="form-group">
+        <label class="form-label" for="deck-name-input">name:</label>
+        <input type="text" id="deck-name-input" class="form-input" placeholder="e.g. computer_science, spanish" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="deck-desc-input">description:</label>
+        <textarea id="deck-desc-input" class="form-textarea" rows="2" placeholder="optional notes..."></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" data-close-modal>cancel</button>
+        <button class="btn btn-primary btn-sm" id="btn-save-deck">save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Create / Edit Card -->
+  <div class="modal-overlay" id="modal-card">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="section-tag">// CARD EDITOR</span>
+          <h3 class="modal-title" id="modal-card-title">Add Card</h3>
+        </div>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+
+      <input type="hidden" id="card-form-id">
+
+      <div class="form-group">
+        <label class="form-label" for="card-front-input">prompt / front:</label>
+        <textarea id="card-front-input" class="form-textarea" rows="3" placeholder="question or prompt..." required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="card-back-input">solution / back:</label>
+        <textarea id="card-back-input" class="form-textarea" rows="4" placeholder="answer or solution..." required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="card-hint-input">hint (optional):</label>
+        <input type="text" id="card-hint-input" class="form-input" placeholder="subtle clue...">
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" data-close-modal>cancel</button>
+        <button class="btn btn-secondary btn-sm" id="btn-save-add-another">save &amp; add next</button>
+        <button class="btn btn-primary btn-sm" id="btn-save-card">save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Script -->
+  <script src="/js/app.js"></script>
+</body>
+</html>
