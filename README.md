@@ -1,6 +1,6 @@
 # SpaceRep
 
-A minimalist, distraction-free spaced repetition flashcard application built with **Node.js**, **SQLite**, and vanilla **HTML/CSS/JS**. Designed with a quiet, Obsidian-inspired dark theme, smooth typography, and a strong focus on usability for students and lifelong learners.
+A minimalist spaced repetition flashcard application built with **Node.js**, **SQLite**, and vanilla **HTML/CSS/JS**. 
 
 ---
 
@@ -28,6 +28,15 @@ A minimalist, distraction-free spaced repetition flashcard application built wit
   - Data saves directly to `./data/spacerep.db` on your computer.
   - Zero cloud dependencies, zero telemetry, full offline capability.
   - 1-click JSON backup export and import.
+
+---
+
+# Images
+<img width="923" height="927" alt="image" src="https://github.com/user-attachments/assets/199acab9-2507-412b-8238-939f400a50bd" />
+
+
+
+
 
 ---
 
