@@ -31,7 +31,7 @@ A minimalist spaced repetition flashcard application built with **Node.js**, **S
 
 ---
 
-# Images
+# 📸 Images
 <img width="923" height="927" alt="image" src="https://github.com/user-attachments/assets/199acab9-2507-412b-8238-939f400a50bd" />
 
 
